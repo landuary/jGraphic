@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	<div id="panel" style="height: 820px;border:1px solid #123456;width: 1300px"></div>
+	</div>
+	<div class="button">
+		<input value="现有数据画点" type="button" onclick="dataPoint()"/>
+		<input value="现有数据画线" type="button" onclick="dataLine()"/>
+		<input value="现有数据画面" type="button" onclick="dataPolygon()"/>
+		<input value="画中国地图" type="button" onclick="drowChina()"/>
+		<input value="设置可编辑" type="button" onclick="setEdit(true)"/>
+		<input value="不可编辑" type="button" onclick="setEdit(false)"/>
+		<input value="开始画点" type="button" onclick="addPoint()"/>
+		<input value="开始画线" type="button" onclick="addLine()"/>
+		<input value="开始画面" type="button" onclick="addPolygon()"/>
+		<input value="清除画布" type="button" onclick="clearCanvas()"/>
+	</div>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jGraphic.js"></script>
+	<script type="text/javascript">
+		var g = new jGraphic({
+				container:"panel",
+				width:1300,
+				height:800
+			});
+		g.showStatus();
+		//g.drowPoint({url:"images/static.png",x:20,y:50});
+		//g.drowArc({radius:100,x:20,y:50});
+		function dataPoint(){
+			var data = [{x:20,y:50},{x:30,y:60},{x:40,y:70},{x:50,y:80}];
+			while(data.length){
+				g.drowArc(data.shift());
+			}
+		}
+		function dataLine(){
+			var data = [{x:20,y:50},{x:20,y:60},{x:20,y:70},{x:20,y:80}];
+			g.drowLine(data);
+		}
+		function dataPolygon(){
+			var data = [{x:20,y:50},{x:30,y:60},{x:40,y:70},{x:50,y:80},{x:60,y:150}];
+			g.drowPolygon(data);
+		}
+		function addPoint(){
+			g.addPoint();
+		}
+		function addLine(){
+			g.addLine();
+		}
+		function addPolygon(){
+			g.addPolygon();
+		}
+		function clearCanvas(){
+			g.clearCanvas();
+			g.clearCanvasH();
+		}
+		function setEdit(flag){
+			flag?function(){
+				g.setEditeStatus();
+				alert("您可以对本图层进行编辑");
+			}():function(){
+				g.unbind();
+				g.setVisibleStatus();
+				alert("您不可以再编辑图层");
+			}()
+		}
+		function drowChina(){
+			var color = ["#123456","#234567","#345678","#561196","#672832","#964521","#359675"];
+			$.getJSON('json/china.json',function(data){
+				$.each(data.features,function(n,v){
+					 var coor = [];
+					 $.each(v.geometry.coordinates[0],function(i,j){
+					 	coor.push(g.geoToScreen({x:j[0],y:j[1]}));
+					 });
+					  g.setFillStyle(color[~~(Math.random()*7)]);
+					 g.drowPolygon(coor);
+				});
+			});
+		}
+	</script>
+</body>
+</html>
